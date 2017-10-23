@@ -1,0 +1,71 @@
+Created linked list with size 0.
+List started with the following items: 28, 17, 26.
+Threads starting.
+Even producer started on a linked list of size 3.
+Odd producer started on a linked list of size 3.
+Even consumer started on a linked list of size 3.
+Odd consumer started on a linked list of size 3.
+Even Consumer: Removed item: 28. List size: 2
+Odd Producer: Appended 39. List size: 3
+Odd Consumer: Removed item: 17. List size: 2
+Even Producer: Appended 10. List size: 3
+Odd Producer: Appended 3. List size: 4
+Even Consumer: Removed item: 26. List size: 3
+Even Producer: Appended 36. List size: 4
+Odd Producer: Appended 13. List size: 5
+Even Producer: Appended 8. List size: 6
+Odd Producer: Appended 11. List size: 7
+Odd Consumer: Removed item: 39. List size: 6
+Even Consumer: Removed item: 10. List size: 5
+Even Producer: Appended 2. List size: 6
+Odd Producer: Appended 25. List size: 7
+Even Producer: Appended 16. List size: 8
+Odd Producer: Appended 19. List size: 9
+Even Producer: Appended 24. List size: 10
+Odd Producer: Appended 27. List size: 11
+Odd Consumer: Removed item: 3. List size: 10
+Even Producer: Appended 8. List size: 11
+Odd Producer: Appended 21. List size: 12
+Even Consumer: Removed item: 36. List size: 11
+Even Producer: Appended 24. List size: 12
+Odd Producer: Appended 7. List size: 13
+Even Producer: Appended 4. List size: 14
+Odd Producer: Appended 3. List size: 15
+Odd Consumer: Removed item: 13. List size: 14
+Even Consumer: Removed item: 8. List size: 13
+Even Producer: Appended 34. List size: 14
+Odd Producer: Appended 3. List size: 15
+Even Producer: Appended 6. List size: 16
+Odd Producer: Appended 31. List size: 17
+Even Producer: Appended 6. List size: 18
+Odd Consumer: Removed item: 11. List size: 17
+Odd Producer: Appended 39. List size: 18
+Even Producer: Appended 36. List size: 19
+Odd Producer: Appended 19. List size: 20
+Even Consumer: Removed item: 2. List size: 19
+Even Producer: Appended 6. List size: 20
+Odd producer exiting.
+Even producer exiting.
+Odd Consumer: Removed item: 25. List size: 19
+Even Consumer: Removed item: 16. List size: 18
+Odd Consumer: Removed item: 19. List size: 17
+Even Consumer: Removed item: 24. List size: 16
+Odd Consumer: Removed item: 27. List size: 15
+Even Consumer: Removed item: 8. List size: 14
+Odd Consumer: Removed item: 21. List size: 13
+Even Consumer: Removed item: 24. List size: 12
+Odd Consumer: Removed item: 7. List size: 11
+Even Consumer: Removed item: 4. List size: 10
+Odd Consumer: Removed item: 3. List size: 9
+Even Consumer: Removed item: 34. List size: 8
+Odd Consumer: Removed item: 3. List size: 7
+Even Consumer: Removed item: 6. List size: 6
+Odd Consumer: Removed item: 31. List size: 5
+Even Consumer: Removed item: 6. List size: 4
+Odd Consumer: Removed item: 39. List size: 3
+Even Consumer: Removed item: 36. List size: 2
+Odd Consumer: Removed item: 19. List size: 1
+Even Consumer: Removed item: 6. List size: 0
+Odd consumer exiting.
+Even consumer exiting.
+All threads joined. Exiting.

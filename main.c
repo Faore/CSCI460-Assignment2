@@ -205,5 +205,7 @@ int main() {
     pthread_join(evenConsumerThread, NULL);
     pthread_join(oddConsumerThread, NULL);
 
+    printf("All threads joined. Exiting.\n");
+
     return 0;
 }
