@@ -54,41 +54,6 @@ void appendData(struct linked_list* linkedList, int data) {
     linkedList->size++;
 }
 
-void safeAppendData(struct linked_list* linkedList, int data) {
-    pthread_mutex_lock(&mutex);
-    appendData(linkedList, data);
-    pthread_mutex_unlock(&mutex);
-}
-
-int removeLastNode(struct linked_list* linkedList) {
-    if(linkedList->size == 0) {
-        return -1;
-    }
-    struct node* node = linkedList->cursor;
-
-    if(node->previous != NULL) {
-        node->previous->next = NULL;
-        linkedList->cursor = node->previous;
-    } else {
-        linkedList->cursor = NULL;
-        linkedList->head = NULL;
-    }
-
-    node->previous = NULL;
-    node->next = NULL;
-    int data = node->data;
-    free(node);
-    linkedList->size--;
-    return data;
-}
-
-int safeRemoveLastNode(struct linked_list* linkedList) {
-    pthread_mutex_lock(&mutex);
-    int item = removeLastNode(linkedList);
-    pthread_mutex_unlock(&mutex);
-    return item;
-}
-
 int removeFirstNode(struct linked_list* linkedList) {
     if(linkedList->size == 0) {
         return -1;
@@ -108,13 +73,6 @@ int removeFirstNode(struct linked_list* linkedList) {
     free(node);
     linkedList->size--;
     return data;
-}
-
-int safeRemoveFirstNode(struct linked_list* linkedList) {
-    pthread_mutex_lock(&mutex);
-    int item = removeFirstNode(linkedList);
-    pthread_mutex_unlock(&mutex);
-    return item;
 }
 
 struct linked_list* createLinkedList() {
@@ -143,8 +101,10 @@ void *evenProducer(void *list) {
 
     while(safeListSize(linkedList) < 20) {
         int random = (rand() % (20 + 1 - 1) + 1) * 2;
-        safeAppendData(linkedList, random);
-        printf("Even Producer: Appended %d. List size: %d\n", random, safeListSize(linkedList));
+        pthread_mutex_lock(&mutex);
+        appendData(linkedList, random);
+        printf("Even Producer: Appended %d. List size: %d\n", random, linkedList->size);
+        pthread_mutex_unlock(&mutex);
         sleep(1);
     }
     printf("Even producer exiting.\n");
@@ -160,35 +120,45 @@ void *oddProducer(void *list) {
         if(random % 2 == 0) {
             random++;
         }
-        safeAppendData(linkedList, random);
-        printf("Odd Producer: Appended %d. List size: %d\n", random, safeListSize(linkedList));
+        pthread_mutex_lock(&mutex);
+        appendData(linkedList, random);
+        printf("Odd Producer: Appended %d. List size: %d\n", random, linkedList->size);
+        pthread_mutex_unlock(&mutex);
         sleep(1);
     }
     printf("Odd producer exiting.\n");
 }
 
-void *headConsumer(void *list) {
+void *evenConsumer(void *list) {
     struct linked_list* linkedList = (struct linked_list*) list;
-    printf("Head consumer started on a linked list of size %d.\n", linkedList->size);
+    printf("Even consumer started on a linked list of size %d.\n", linkedList->size);
 
     while(safeListSize(linkedList) != 0) {
-        int removed = safeRemoveFirstNode(linkedList);
-        printf("Head Consumer: Removed item: %d. List size: %d\n", removed, safeListSize(linkedList));
-        sleep(3);
-    }
-    printf("Head consumer exiting.\n");
-}
-
-void *tailConsumer(void *list) {
-    struct linked_list* linkedList = (struct linked_list*) list;
-    printf("Tail consumer started on a linked list of size %d.\n", linkedList->size);
-    sleep(1);
-    while(safeListSize(linkedList) != 0) {
-        int removed = safeRemoveLastNode(linkedList);
-        printf("Tail Consumer: Removed item: %d. List size: %d\n", removed, safeListSize(linkedList));
+        pthread_mutex_lock(&mutex);
+        if(linkedList->head->data % 2 == 0) {
+            int removed = removeFirstNode(linkedList);
+            printf("Even Consumer: Removed item: %d. List size: %d\n", removed, linkedList->size);
+        }
+        pthread_mutex_unlock(&mutex);
         sleep(2);
     }
-    printf("Tail consumer exiting.\n");
+    printf("Even consumer exiting.\n");
+}
+
+void *oddConsumer(void *list) {
+    struct linked_list* linkedList = (struct linked_list*) list;
+    printf("Odd consumer started on a linked list of size %d.\n", linkedList->size);
+    sleep(1);
+    while(safeListSize(linkedList) != 0) {
+        pthread_mutex_lock(&mutex);
+        if(linkedList->head->data % 2 != 0) {
+            int removed = removeFirstNode(linkedList);
+            printf("Odd Consumer: Removed item: %d. List size: %d\n", removed, linkedList->size);
+        }
+        pthread_mutex_unlock(&mutex);
+        sleep(3);
+    }
+    printf("Odd consumer exiting.\n");
 }
 
 int main() {
@@ -207,10 +177,10 @@ int main() {
 
     pthread_t evenProducerThread;
     pthread_t oddProducerThread;
-    pthread_t headConsumerThread;
-    pthread_t tailConsumerThread;
+    pthread_t evenConsumerThread;
+    pthread_t oddConsumerThread;
 
-    printf("Threads starting.\n")
+    printf("Threads starting.\n");
 
     if(pthread_create(&evenProducerThread, NULL, evenProducer, (void *) linkedList)) {
         printf("Error creating even producer thread.\n");
@@ -222,22 +192,18 @@ int main() {
         exit(2);
     }
 
-    if(pthread_create(&headConsumerThread, NULL, headConsumer, (void *) linkedList)) {
+    if(pthread_create(&evenConsumerThread, NULL, evenConsumer, (void *) linkedList)) {
         printf("Error creating head consumer thread.\n");
         exit(2);
     }
-
-    if(pthread_create(&tailConsumerThread, NULL, tailConsumer, (void *) linkedList)) {
+    if(pthread_create(&oddConsumerThread, NULL, oddConsumer, (void *) linkedList)) {
         printf("Error creating tail consumer thread.\n");
         exit(2);
     }
-
     pthread_join(evenProducerThread, NULL);
     pthread_join(oddProducerThread, NULL);
-    pthread_join(headConsumerThread, NULL);
-    pthread_join(tailConsumerThread, NULL);
-
-    printf("All threads joined. Exiting.\n");
+    pthread_join(evenConsumerThread, NULL);
+    pthread_join(oddConsumerThread, NULL);
 
     return 0;
 }
